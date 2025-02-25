@@ -1,0 +1,39 @@
+:root {
+    --bs-primary: #483D8B;
+    --bs-primary-rgb: 72, 61, 139;
+}
+
+.bg-primary {
+    background-color: #483D8B !important;
+}
+
+.btn-primary {
+    background-color: #483D8B !important;
+    border-color: #483D8B !important;
+}
+
+.btn-primary:hover {
+    background-color: #3c3274 !important;
+    border-color: #3c3274 !important;
+}
+
+.text-primary {
+    color: #483D8B !important;
+}
+
+.navbar-dark {
+    background-color: #483D8B !important;
+}
+
+.nav-link:hover {
+    color: #a9a3d1 !important;
+}
+
+/* Links and other primary-colored elements */
+a {
+    color: #483D8B;
+}
+
+a:hover {
+    color: #3c3274;
+}

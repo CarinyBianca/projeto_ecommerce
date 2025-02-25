@@ -1,0 +1,259 @@
+/* Variáveis de cores */
+:root {
+    --primary-color: #191970;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --bs-primary: #191970;
+    --bs-primary-rgb: 25, 25, 112;
+    --bs-primary-text-emphasis: #191970;
+    --bs-primary-bg-subtle: #e6e6f0;
+    --bs-primary-border-subtle: #b3b3d9;
+}
+
+/* Estilos gerais */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Botões */
+.btn {
+    border-radius: 5px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: #191970 !important;
+    border-color: #191970 !important;
+}
+
+.btn-primary:hover {
+    background-color: #13134d !important;
+    border-color: #13134d !important;
+}
+
+/* Links */
+a {
+    color: #191970;
+}
+
+a:hover {
+    color: #13134d;
+}
+
+/* Navbar */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background-color: #191970 !important;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #ffffff;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link:focus {
+    color: #ffffff;
+}
+
+.navbar-dark .navbar-nav .active > .nav-link,
+.navbar-dark .navbar-nav .nav-link.active {
+    color: #ffffff;
+    background-color: #0056b3;
+}
+
+.nav-link:hover {
+    color: #b3b3d9 !important;
+}
+
+/* Forms */
+.form-control {
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+}
+
+.form-control:focus {
+    border-color: #191970;
+    box-shadow: 0 0 0 0.25rem rgba(25, 25, 112, 0.25);
+}
+
+/* Cards */
+.card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.card-header {
+    background-color: var(--light-color);
+}
+
+.card-primary {
+    border-color: #191970;
+}
+
+.card-primary .card-header {
+    background-color: #191970;
+    color: white;
+}
+
+/* Badges */
+.badge {
+    padding: 0.4em 0.6em;
+    font-weight: 500;
+}
+
+.badge-primary {
+    background-color: var(--primary-color);
+}
+
+/* Progress bars */
+.progress-bar {
+    background-color: var(--primary-color);
+}
+
+/* List groups */
+.list-group-item.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Alerts */
+.alert {
+    border-radius: 5px;
+    border: none;
+}
+
+.alert-primary {
+    background-color: var(--light-color);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+/* Custom components */
+.product-card:hover {
+    border-color: var(--primary-color);
+}
+
+.btn-add-cart {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-add-cart:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.cart-quantity-badge {
+    background-color: var(--primary-color);
+    color: #ffffff;
+}
+
+.price {
+    color: var(--primary-color);
+}
+
+.custom-primary {
+    color: #191970;
+}
+
+.custom-primary-bg {
+    background-color: #191970;
+    color: white;
+}
+
+/* Active page indicator */
+.nav-link.active {
+    background-color: #0056b3 !important;
+    color: #ffffff !important;
+}
+
+/* Footer */
+.footer {
+    background-color: var(--dark-color);
+    color: #ffffff;
+}
+
+.footer a {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.footer a:hover {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+/* Pagination */
+.page-link {
+    color: var(--primary-color);
+}
+
+.page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Tables */
+.table-hover tbody tr:hover {
+    background-color: var(--light-color);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .card-img-top {
+        height: 150px;
+    }
+    
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+    
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}
+
+.bg-primary {
+    background-color: #191970 !important;
+}
+
+.btn-outline-primary {
+    color: #191970;
+    border-color: #191970;
+}
+
+.btn-outline-primary:hover {
+    background-color: #191970;
+    border-color: #191970;
+    color: white;
+}
+
+.text-primary {
+    color: #191970 !important;
+}

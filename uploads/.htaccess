@@ -1,0 +1,23 @@
+# Permitir apenas imagens
+<FilesMatch "(?i)\.(php|php3?|phtml|js)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Permitir apenas tipos de arquivo específicos
+<FilesMatch "(?i)\.(jpg|jpeg|png|gif|webp)$">
+    Order Deny,Allow
+    Allow from all
+</FilesMatch>
+
+# Desabilitar execução de scripts
+Options -ExecCGI
+AddHandler cgi-script .php .php3 .php4 .phtml .pl .py .jsp .asp .htm .shtml .sh .cgi
+
+# Proteger contra acesso direto a arquivos
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP_REFERER} !^http://(www\.)?localhost [NC]
+    RewriteCond %{HTTP_REFERER} !^http://(www\.)?localhost.*$ [NC]
+    RewriteRule \.(jpg|jpeg|png|gif|webp)$ - [F]
+</IfModule>

@@ -1,0 +1,22 @@
+# Negar acesso a todos os visitantes
+Order Deny,Allow
+Deny from all
+
+# Permitir acesso apenas ao servidor local
+Allow from 127.0.0.1
+Allow from ::1
+
+# Proteger arquivos sensíveis
+<FilesMatch "^(config\.php|\.htaccess)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Desabilitar listagem de diretórios
+Options -Indexes
+
+# Prevenir acesso a arquivos de backup e logs
+<FilesMatch "\.(bak|config|sql|fla|psd|ini|log|sh|inc|swp|dist)|~$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

@@ -1,0 +1,38 @@
+# Habilitar reescrita de URL
+RewriteEngine On
+
+# Forçar HTTPS
+RewriteCond %{HTTPS} !=on
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Desabilitar listagem de diretórios
+Options -Indexes
+
+# Proteger arquivos sensíveis
+<FilesMatch "\.(env|config|ini|log|sh|inc|swp|dist)|~$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Definir página de erro personalizada
+ErrorDocument 404 /ecommerce/frontend/404.php
+ErrorDocument 403 /ecommerce/frontend/403.php
+
+# Definir cabeçalhos de segurança
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+# Configurar cache para arquivos estáticos
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+</IfModule>

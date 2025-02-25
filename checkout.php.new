@@ -1,0 +1,279 @@
+<?php
+require_once 'config.php';
+require_once 'backend/classes/Database.php';
+
+// Verifica se o usuário está logado
+if (!isset($_SESSION['cliente_id'])) {
+    $_SESSION['mensagem'] = "Por favor, faça login para continuar.";
+    $_SESSION['tipo_mensagem'] = "warning";
+    header('Location: login.php');
+    exit;
+}
+
+// Verifica se há itens no carrinho
+if (empty($_SESSION['carrinho'])) {
+    $_SESSION['mensagem'] = "Seu carrinho está vazio.";
+    $_SESSION['tipo_mensagem'] = "warning";
+    header('Location: carrinho.php');
+    exit;
+}
+
+// Calcula o total do carrinho
+$db = new Database();
+$subtotal = 0;
+foreach ($_SESSION['carrinho'] as $produto_id => $quantidade) {
+    $stmt = $db->query("SELECT preco FROM produtos WHERE id = ?", [$produto_id]);
+    $produto = $stmt->fetch();
+    $subtotal += $produto['preco'] * $quantidade;
+}
+
+// Define o título da página
+$title = "Checkout";
+
+// Include do header
+include 'includes/header.php';
+?>
+
+<div class="container my-5">
+    <h2>Finalizar Compra</h2>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Formulário de Endereço -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">Endereço de Entrega</h3>
+                    <form id="endereco-form">
+                        <div class="mb-3">
+                            <label for="cep" class="form-label">CEP</label>
+                            <input type="text" class="form-control" id="cep" name="cep">
+                        </div>
+                        <div class="mb-3">
+                            <label for="logradouro" class="form-label">Logradouro</label>
+                            <input type="text" class="form-control" id="logradouro" name="logradouro">
+                        </div>
+                        <div class="mb-3">
+                            <label for="numero" class="form-label">Número</label>
+                            <input type="text" class="form-control" id="numero" name="numero">
+                        </div>
+                        <div class="mb-3">
+                            <label for="complemento" class="form-label">Complemento</label>
+                            <input type="text" class="form-control" id="complemento" name="complemento">
+                        </div>
+                        <div class="mb-3">
+                            <label for="bairro" class="form-label">Bairro</label>
+                            <input type="text" class="form-control" id="bairro" name="bairro">
+                        </div>
+                        <div class="mb-3">
+                            <label for="cidade" class="form-label">Cidade</label>
+                            <input type="text" class="form-control" id="cidade" name="cidade">
+                        </div>
+                        <div class="mb-3">
+                            <label for="estado" class="form-label">Estado</label>
+                            <input type="text" class="form-control" id="estado" name="estado">
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Opções de Frete -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">Opções de Frete</h3>
+                    <div id="opcoes-frete">
+                        <p class="text-muted">Digite seu CEP para calcular o frete</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulário de Pagamento -->
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Forma de Pagamento</h3>
+                    <form id="pagamento-form" class="mt-3">
+                        <div class="mb-3">
+                            <label class="form-label">Selecione a forma de pagamento</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="formaPagamento" id="pix" value="pix" checked>
+                                <label class="form-check-label" for="pix">
+                                    PIX
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="formaPagamento" id="boleto" value="boleto">
+                                <label class="form-check-label" for="boleto">
+                                    Boleto Bancário
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="formaPagamento" id="cartao" value="cartao">
+                                <label class="form-check-label" for="cartao">
+                                    Cartão de Crédito
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumo do Pedido -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Resumo do Pedido</h3>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span>R$ <?= number_format($subtotal, 2, ',', '.') ?></span>
+                        <input type="hidden" id="subtotal" value="<?= $subtotal ?>">
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Frete:</span>
+                        <span id="valor-frete">R$ 0,00</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Total:</strong>
+                        <strong id="total">R$ <?= number_format($subtotal, 2, ',', '.') ?></strong>
+                    </div>
+                    <form id="checkout-form" onsubmit="finalizarCompra(event)">
+                        <button type="submit" class="btn btn-primary w-100">
+                            Finalizar Compra
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Função para consultar CEP
+async function consultarCEP() {
+    const cep = document.getElementById('cep').value.replace(/\D/g, '');
+    
+    if (cep.length !== 8) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`consultar_cep.php?cep=${cep}`);
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.error || 'Erro ao consultar CEP');
+        }
+
+        // Preenche os campos do endereço
+        document.getElementById('logradouro').value = data.logradouro || '';
+        document.getElementById('bairro').value = data.bairro || '';
+        document.getElementById('cidade').value = data.cidade || '';
+        document.getElementById('estado').value = data.estado || '';
+        
+        // Atualiza valores de frete
+        if (data.frete && data.frete.length > 0) {
+            const freteHtml = data.frete.map(opcao => `
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="frete" 
+                           id="frete_${opcao.tipo}" value="${opcao.valor}" 
+                           onchange="atualizarTotal()">
+                    <label class="form-check-label" for="frete_${opcao.tipo}">
+                        ${opcao.tipo} - R$ ${Number(opcao.valor).toFixed(2)}
+                    </label>
+                </div>
+            `).join('');
+            
+            document.getElementById('opcoes-frete').innerHTML = freteHtml;
+            
+            // Seleciona o primeiro frete por padrão
+            const primeiroFrete = document.querySelector('input[name="frete"]');
+            if (primeiroFrete) {
+                primeiroFrete.checked = true;
+                atualizarTotal();
+            }
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        document.getElementById('opcoes-frete').innerHTML = '<p class="text-danger">Erro ao calcular o frete. Por favor, tente novamente.</p>';
+    }
+}
+
+// Função para formatar valor em reais
+function formatarMoeda(valor) {
+    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+// Função para atualizar o total
+function atualizarTotal() {
+    const subtotal = parseFloat(document.getElementById('subtotal').value) || 0;
+    const freteRadio = document.querySelector('input[name="frete"]:checked');
+    const frete = freteRadio ? parseFloat(freteRadio.value) : 0;
+    
+    const total = subtotal + frete;
+    
+    document.getElementById('valor-frete').textContent = formatarMoeda(frete);
+    document.getElementById('total').textContent = formatarMoeda(total);
+}
+
+// Função para finalizar a compra
+async function finalizarCompra(event) {
+    event.preventDefault();
+    
+    try {
+        const formData = new FormData();
+        
+        // Dados do endereço
+        formData.append('cep', document.getElementById('cep').value || '');
+        formData.append('logradouro', document.getElementById('logradouro').value || '');
+        formData.append('numero', document.getElementById('numero').value || '');
+        formData.append('complemento', document.getElementById('complemento').value || '');
+        formData.append('bairro', document.getElementById('bairro').value || '');
+        formData.append('cidade', document.getElementById('cidade').value || '');
+        formData.append('estado', document.getElementById('estado').value || '');
+        
+        // Dados do frete e pagamento
+        const freteRadio = document.querySelector('input[name="frete"]:checked');
+        formData.append('frete', freteRadio ? freteRadio.value : '0');
+        
+        const pagamentoRadio = document.querySelector('input[name="formaPagamento"]:checked');
+        formData.append('forma_pagamento', pagamentoRadio ? pagamentoRadio.value : 'dinheiro');
+        
+        // Valores
+        const subtotal = document.getElementById('subtotal').value || '0';
+        const frete = freteRadio ? freteRadio.value : '0';
+        const total = (parseFloat(subtotal) + parseFloat(frete)).toFixed(2);
+        
+        formData.append('subtotal', subtotal);
+        formData.append('total', total);
+
+        const response = await fetch('finalizar_compra.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            window.location.href = `pedido_confirmado.php?pedido_id=${data.pedido_id}`;
+        } else {
+            throw new Error(data.message || 'Erro ao finalizar compra');
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert(error.message || 'Erro ao processar a compra. Por favor, tente novamente.');
+    }
+}
+
+// Adiciona os event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const cepInput = document.getElementById('cep');
+    if (cepInput) {
+        cepInput.addEventListener('blur', consultarCEP);
+    }
+    
+    // Inicializa o total
+    atualizarTotal();
+});
+</script>
+
+<?php include 'includes/footer.php'; ?>
